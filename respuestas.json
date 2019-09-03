@@ -1,0 +1,37 @@
+[
+    {
+        "ID": "#UUID1",
+        "#UUID1": 1,
+        "#UUID2": 2,
+        "#UUID3": 1,
+        "#UUID4": 3
+    },
+    {
+        "ID": "#UUID2",
+        "#UUID1": 3,
+        "#UUID2": 1,
+        "#UUID3": 1,
+        "#UUID4": 2
+    },
+    {
+        "ID": "#UUID3",
+        "#UUID1": 2,
+        "#UUID2": 1,
+        "#UUID3": 2,
+        "#UUID4": 2
+    },
+    {
+        "ID": "#UUID4",
+        "#UUID1": 1,
+        "#UUID2": 3,
+        "#UUID3": 1,
+        "#UUID4": 1
+    },
+    {
+        "ID": "#UUID5",
+        "#UUID1": 2,
+        "#UUID2": 3,
+        "#UUID3": 3,
+        "#UUID4": 3
+    }
+]
