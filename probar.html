@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<head>
+</head>
+<body>
+    <script>
+        /*fetch("http://192.168.1.22:3002/crear_cotejo_y_enviar", {
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify({
+                nombre: "noticia2",
+                etiqueta: "sm2",
+                lada: "983"
+            }), // data can be `string` or {object}!
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            console.log(res)
+            return(res.json())
+        })
+        .catch(error => console.error('Error:', error))
+        .then(response => console.log('Success:', response));*/
+        fetch("http://192.168.1.22:3002/cambiar_registro_en_cotejo", {
+            method: 'PUT', // or 'PUT'
+            body: JSON.stringify({
+                envio_id: "9143C6E5-FCCB-4CE5-9E20-E5279E9D0365"
+            }), // data can be `string` or {object}!
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            console.log(res)
+            return(res.json())
+        })
+        .catch(error => console.error('Error:', error))
+        .then(response => console.log('Success:', response));
+    </script>
+    <div>Pruebas</div>
+</body>
