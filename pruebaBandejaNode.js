@@ -13,6 +13,7 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false}))
 
 const config = {
     user: 'sa',
@@ -86,10 +87,11 @@ app.get('/filter', async (req, res) => {
 })
 
 app.post('/crear_cotejo', async (req, res) => {
-    const { nombre, etiqueta, lada} = req.body
+    const { nombre, etiqueta, lada, mensaje } = req.body
+    console.log( nombre, etiqueta, lada, mensaje )
     await pool1Connect; // ensures that the pool has been created
     try {
-        let query = `select * from cat_grupo_envio where nombre = '${nombre}'`
+        let query = `use difusion_integral_armando; select * from cat_grupo_envio where nombre = '${nombre}'`
         const request = pool1.request()
         const result = await request.query(query)
         console.log(result)
@@ -102,10 +104,10 @@ app.post('/crear_cotejo', async (req, res) => {
             else if (!etiqueta && lada) {filters = `where contactos.telefono_uno like '${lada}_______'`}
             else if (etiqueta && !lada) {filters = `where cat_etiquetas.name = '${etiqueta}'`}
             else {filters = `where cat_etiquetas.name = 'sm2'`}
-            let query = `
+            let query = `use difusion_integral_armando;
             BEGIN TRANSACTION;  
-                INSERT INTO cat_grupo_envio (id, nombre) VALUES ('${queryUUID}', '${nombre}')
-                INSERT INTO bandeja_salida (cat_envio_id, contacto_id, enviado) select '${queryUUID}', contactos.id, 0 from contactos
+                INSERT INTO cat_grupo_envio (id, nombre, mensaje) VALUES ('${queryUUID}', '${nombre}', '${mensaje}')
+                INSERT INTO bandeja_salida (cat_envio_id, contacto_id, enviado, numero) select '${queryUUID}', contactos.id, 0, contactos.telefono_uno from contactos
                     inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
                     inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
                     ${filters}
