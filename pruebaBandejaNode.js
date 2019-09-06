@@ -170,4 +170,26 @@ app.put('/cambiar_registro_en_cotejo', async (req, res) => {
     }
 })
 
+app.get('/checar_cotejo', async (req, res) => {
+    const { envio_id } = req.query
+    await pool1Connect; // ensures that the pool has been created
+    try {
+        let query = `
+        use difusion_integral_armando;
+        select * 
+        from bandeja_salida
+        WHERE id = '${envio_id}'`
+        const request = pool1.request()
+        const result = await request.query(query)
+        if (result.recordset[0].enviado === 0) {
+            res.json(true)
+        } else {
+            res.json(false)
+        }
+    } catch (err) {
+        console.error('SQL error', err);
+        res.json(false)
+    }
+})
+
 app.listen(3002)
