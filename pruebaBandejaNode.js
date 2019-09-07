@@ -141,7 +141,7 @@ app.get('/obtener_cotejos_con_id_no_enviados', async (req, res) => {
     const { cotejo_id } = req.query
     await pool1Connect; // ensures that the pool has been created
     try {
-        let query = `select * from bandeja_salida where cat_envio_id = '${cotejo_id}' and enviado = 0`
+        let query = `select id, numero from bandeja_salida where cat_envio_id = '${cotejo_id}' and enviado = 0`
         const request = pool1.request()
         const result = await request.query(query)
         console.log(result)
