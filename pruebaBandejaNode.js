@@ -158,7 +158,7 @@ app.put('/cambiar_registro_en_cotejo', async (req, res) => {
     try {
         let query = `
         UPDATE bandeja_salida
-        SET enviado = 1
+        SET enviado = 1, modificado = getdate()
         WHERE id = '${envio_id}'`
         const request = pool1.request()
         const result = await request.query(query)
