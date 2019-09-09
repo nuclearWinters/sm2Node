@@ -53,21 +53,21 @@ app.get('/filter', async (req, res) => {
         let query = ""
         if (etiqueta && lada) {
             query = `use difusion_integral;
-            select * from contactos
+            select contactos.id from contactos
             inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
             inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
             where cat_etiquetas.name = '${etiqueta}' and contactos.telefono_uno like '${lada}_______'
             and contactos.activo = 1;`
         } else if (!etiqueta && lada) {
             query = `use difusion_integral;
-            select * from contactos
+            select contactos.id from contactos
             inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
             inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
             where contactos.telefono_uno like '${lada}_______'
             and contactos.activo = 1;`
         } else if (etiqueta && !lada) {
             query = `use difusion_integral;
-            select * from contactos
+            select contactos.id from contactos
             inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
             inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
             where cat_etiquetas.name = '${etiqueta}'
@@ -88,13 +88,11 @@ app.get('/filter', async (req, res) => {
 
 app.post('/crear_cotejo', async (req, res) => {
     const { nombre, etiqueta, lada, mensaje } = req.body
-    console.log( nombre, etiqueta, lada, mensaje )
     await pool1Connect; // ensures that the pool has been created
     try {
         let query = `use difusion_integral_armando; select * from cat_grupo_envio where nombre = '${nombre}'`
         const request = pool1.request()
         const result = await request.query(query)
-        console.log(result)
         if (result.recordset.length !== 0) {
             throw "el nombre ya existe"
         } else {
@@ -115,7 +113,6 @@ app.post('/crear_cotejo', async (req, res) => {
             COMMIT;`
             const request = pool1.request()
             const result = await request.query(query)
-            console.log(result)
         }
         res.json({})
     } catch (err) {
@@ -144,7 +141,6 @@ app.get('/obtener_cotejos_con_id_no_enviados', async (req, res) => {
         let query = `select id, numero from bandeja_salida where cat_envio_id = '${cotejo_id}' and enviado = 0`
         const request = pool1.request()
         const result = await request.query(query)
-        console.log(result)
         res.json(result.recordset)
     } catch (err) {
         console.error('SQL error', err);
@@ -153,16 +149,16 @@ app.get('/obtener_cotejos_con_id_no_enviados', async (req, res) => {
 })
 
 app.put('/cambiar_registro_en_cotejo', async (req, res) => {
-    const { envio_id } = req.body
+    const { envio_id, dispositivo } = req.body
+    console.log(envio_id, dispositivo)
     await pool1Connect; // ensures that the pool has been created
     try {
         let query = `
         UPDATE bandeja_salida
-        SET enviado = 1, modificado = getdate()
+        SET enviado = 1, modificado = getdate(), dispositivos = '${dispositivo}'
         WHERE id = '${envio_id}'`
         const request = pool1.request()
         const result = await request.query(query)
-        console.log(result)
         res.json(result.recordset)
     } catch (err) {
         console.error('SQL error', err);
