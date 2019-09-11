@@ -188,4 +188,56 @@ app.get('/checar_cotejo', async (req, res) => {
     }
 })
 
+app.get('/checar_enviados', async (req, res) => {
+    let { fechaInicio, fechaFin } = req.query
+    let today = new Date().toISOString().split('T')[0]
+    console.log(fechaInicio, fechaFin)
+    await pool1Connect; // ensures that the pool has been created
+    try {
+        let query = `
+        use difusion_integral_armando;
+        SELECT (select count(*) as total, 
+        CASE
+            WHEN dispositivos is NULL THEN 'NULL'
+            ELSE dispositivos 
+        END AS 'name'
+        FROM bandeja_salida 
+        WHERE enviado = 1
+        AND modificado >= Convert(datetime, '${fechaInicio}' )
+        AND modificado <= Convert(datetime, '${fechaFin}' )
+        GROUP BY dispositivos 
+        FOR JSON AUTO) as 'dispositivos',
+        (SELECT cat_etiquetas.name, count(*) as total
+        FROM bandeja_salida
+        inner join cat_etiquetas_contactos on bandeja_salida.contacto_id = cat_etiquetas_contactos.contacto_id
+        inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
+        WHERE enviado = 1
+        AND modificado >= Convert(datetime, '${fechaInicio}' )
+        AND modificado <= Convert(datetime, '${fechaFin}' )
+        GROUP BY cat_etiquetas.name FOR JSON AUTO) as 'etiquetas',
+        (SELECT SUBSTRING( numero, 1 , 3 ) as 'name', count(*) as total
+        FROM bandeja_salida
+        WHERE enviado = 1
+        AND modificado >= Convert(datetime, '${fechaInicio}' )
+        AND modificado <= Convert(datetime, '${fechaFin}' )
+        GROUP BY SUBSTRING( numero, 1 , 3 )
+        ORDER BY SUBSTRING( numero, 1 , 3 )
+        FOR JSON AUTO) as 'lada',
+        (SELECT count(*) as total
+        FROM bandeja_salida
+        WHERE enviado = 1
+        AND modificado >= Convert(datetime, '${fechaInicio}' )
+        AND modificado <= Convert(datetime, '${fechaFin}' )
+        FOR JSON AUTO) as 'total'
+        FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
+        `
+        const request = pool1.request()
+        const result = await request.query(query)
+        res.send(result.recordset[0][Object.keys(result.recordset[0])[0]])
+    } catch (err) {
+        console.error('SQL error', err);
+        res.json(false)
+    }
+})
+
 app.listen(3002)
