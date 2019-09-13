@@ -190,15 +190,13 @@ app.get('/checar_cotejo', async (req, res) => {
 
 app.get('/checar_enviados', async (req, res) => {
     let { fechaInicio, fechaFin } = req.query
-    let today = new Date().toISOString().split('T')[0]
-    console.log(fechaInicio, fechaFin)
     await pool1Connect; // ensures that the pool has been created
     try {
         let query = `
         use difusion_integral_armando;
         SELECT (select count(*) as total, 
         CASE
-            WHEN dispositivos is NULL THEN 'NULL'
+            WHEN dispositivos is NULL THEN 'Sin dispositivo'
             ELSE dispositivos 
         END AS 'name'
         FROM bandeja_salida 
@@ -215,13 +213,27 @@ app.get('/checar_enviados', async (req, res) => {
         AND modificado >= Convert(datetime, '${fechaInicio}' )
         AND modificado <= Convert(datetime, '${fechaFin}' )
         GROUP BY cat_etiquetas.name FOR JSON AUTO) as 'etiquetas',
-        (SELECT SUBSTRING( numero, 1 , 3 ) as 'name', count(*) as total
+        (SELECT count(*) as total,
+        CASE
+            WHEN SUBSTRING( numero, 1 , 3 ) = '983' THEN '983'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '984' THEN '984'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '987' THEN '987'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '997' THEN '997'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '998' THEN '998'
+            ELSE 'otros' 
+        END AS 'name'
         FROM bandeja_salida
         WHERE enviado = 1
         AND modificado >= Convert(datetime, '${fechaInicio}' )
         AND modificado <= Convert(datetime, '${fechaFin}' )
-        GROUP BY SUBSTRING( numero, 1 , 3 )
-        ORDER BY SUBSTRING( numero, 1 , 3 )
+        GROUP BY CASE
+            WHEN SUBSTRING( numero, 1 , 3 ) = '983' THEN '983'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '984' THEN '984'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '987' THEN '987'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '997' THEN '997'
+            WHEN SUBSTRING( numero, 1 , 3 ) = '998' THEN '998'
+            ELSE 'otros' 
+        END
         FOR JSON AUTO) as 'lada',
         (SELECT count(*) as total
         FROM bandeja_salida
