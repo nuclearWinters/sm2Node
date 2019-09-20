@@ -110,6 +110,8 @@ app.post('/crear_cotejo', async (req, res) => {
                     inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
                     ${filters}
                     and contactos.activo = 1
+                    update cat_grupo_envio set total = 
+				    (select COUNT(id) from bandeja_salida where cat_envio_id = '${queryUUID}') where id = '${queryUUID}'
             COMMIT;`
             const request = pool1.request()
             const result = await request.query(query)
