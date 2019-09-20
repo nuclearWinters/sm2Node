@@ -52,21 +52,21 @@ app.get('/filter', async (req, res) => {
     try {
         let query = ""
         if (etiqueta && lada) {
-            query = `use difusion_integral;
+            query = `use difusion_integral_armando;
             select contactos.id from contactos
             inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
             inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
             where cat_etiquetas.name = '${etiqueta}' and contactos.telefono_uno like '${lada}_______'
             and contactos.activo = 1;`
         } else if (!etiqueta && lada) {
-            query = `use difusion_integral;
+            query = `use difusion_integral_armando;
             select contactos.id from contactos
             inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
             inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
             where contactos.telefono_uno like '${lada}_______'
             and contactos.activo = 1;`
         } else if (etiqueta && !lada) {
-            query = `use difusion_integral;
+            query = `use difusion_integral_armando;
             select contactos.id from contactos
             inner join cat_etiquetas_contactos on cat_etiquetas_contactos.contacto_id = contactos.id
             inner join cat_etiquetas on cat_etiquetas.id = cat_etiquetas_contactos.cat_etiqueta_id
